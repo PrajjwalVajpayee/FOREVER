@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/frontend_assets/assets";
+import RelatedProduct from "../components/RelatedProduct";
 
 
 const Product = () => {
@@ -85,7 +86,8 @@ fetchProductData();
              </div>
 
   {/*  ----------Display Related Product */}
-
+     
+     <RelatedProduct category = {productData.category} subCategory={productData.subCategory} />
 
     </div>
   ):<div className="opacity-0"></div>
