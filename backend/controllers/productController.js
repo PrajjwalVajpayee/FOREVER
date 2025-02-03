@@ -16,31 +16,21 @@ const addProduct = async (req,res)=>{
 
       if (images.length === 0) {
         return res.status(400).json({ success: false, message: "No images uploaded" });
+        
       }
    
       let imagesUrl = await Promise.all(
-        images.map(async (file) => {
-          try {
-            let result = await cloudinary.uploader.upload_stream({ resource_type: "image" }, (error, result) => {
-              if (error) {
-                console.error("Cloudinary upload error:", error);
-                return null;
-              }
-              return result.secure_url;
-            }).end(file.buffer); // Upload buffer directly
-            return result;
-          } catch (error) {
-            console.error("Cloudinary error:", error);
-            return null;
-          }
-        })
+       images.map(async(item)=>{
+         let result = await cloudinary.uploader.upload(item.path,{resource_type:'image'});
+         return result.secure_url;
+       })
       );
 
-      imagesUrl = imagesUrl.filter(url => url !== null);
-      console.log(imagesUrl);
-      if (imagesUrl.length === 0) {
-        return res.status(500).json({ success: false, message: "Image upload failed" });
-      }
+      // imagesUrl = imagesUrl.filter(url => url !== null);
+      // console.log(imagesUrl);
+      // if (imagesUrl.length === 0) {
+      //   return res.status(500).json({ success: false, message: "Image upload failed" });
+      // }
        const productData = {
         name,
         description,
@@ -52,14 +42,16 @@ const addProduct = async (req,res)=>{
         image:imagesUrl,
         date:Date.now()
        }
-
+       console.log("Saving product:", productData);
        const product = new productModel(productData);
+       console.log("Saving product:", productData);
+
        await product.save();
 
        res.json({success:true,message:"product added"});
 
     console.log(name,description,price,category,subCategory,sizes,bestseller);
-    console.log(images);
+    console.log(imagesUrl);
       
   } catch (error) {
     console.log(error);
